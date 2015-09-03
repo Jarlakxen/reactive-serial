@@ -36,7 +36,7 @@ case class ReactiveSerial(port: Port) {
 
 object ReactiveSerial {
 
-  lazy val ports = SerialPort.getCommPorts().map(new Port(_)).toList
+  lazy val ports = SerialPort.getCommPorts.map(new Port(_)).toList
 
   def port(descriptor: String) = new Port(SerialPort.getCommPort(descriptor))
 

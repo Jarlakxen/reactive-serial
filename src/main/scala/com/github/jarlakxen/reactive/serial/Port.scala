@@ -10,11 +10,10 @@ import java.io.IOException
  */
 class Port(port: SerialPort) {
 
-  //port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0)
-
   def systemName = port.getSystemPortName
 
   def open: Try[_] = {
+    port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0)
     if (port.openPort)
       Success(())
     else
