@@ -12,7 +12,7 @@ import org.reactivestreams.{ Publisher, Subscriber }
  * @author fviale
  */
 
-case class ReactiveSerial(port: Port) {
+case class ReactiveSerial(port: Port, baudRate: Int = 9600) {
 
   def publisher(bufferSize: Int)(implicit actorSystem: ActorSystem): Publisher[ByteString] =
     ActorPublisher[ByteString](actorPublisher(bufferSize))
@@ -21,7 +21,7 @@ case class ReactiveSerial(port: Port) {
     actorSystem.actorOf(actorPublisherProps(bufferSize))
 
   def actorPublisherProps(bufferSize: Int): Props =
-    Props(new SerialActorPublisher(port, bufferSize))
+    Props(new SerialActorPublisher(port, baudRate, bufferSize))
 
   def subscriber(requestStrategyProvider: RequestStrategy)(implicit actorSystem: ActorSystem): Subscriber[ByteString] =
     ActorSubscriber[ByteString](actorSubscriber(requestStrategyProvider))
@@ -30,7 +30,7 @@ case class ReactiveSerial(port: Port) {
     actorSystem.actorOf(actorSubscriberProps(requestStrategyProvider))
 
   def actorSubscriberProps(requestStrategyProvider: RequestStrategy): Props =
-    Props(new SerialActorSubscriber(port, requestStrategyProvider))
+    Props(new SerialActorSubscriber(port, baudRate, requestStrategyProvider))
 
 }
 

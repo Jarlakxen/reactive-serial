@@ -41,7 +41,7 @@ class ReactiveSerialSpec extends Specification with Mockito with Environment {
 
         val port = spy(new Port(null))
 
-        doReturn(Success(())).when(port).open
+        doReturn(Success(())).when(port).open(anyInt)
         doReturn(Success(())).when(port).close
 
         val streamProbe = Source.actorPublisher(ReactiveSerial(port).actorPublisherProps(100)).runWith(TestSink.probe[ByteString])
@@ -65,7 +65,7 @@ class ReactiveSerialSpec extends Specification with Mockito with Environment {
 
         val port = mock[Port]
 
-        doReturn(Success(())).when(port).open
+        doReturn(Success(())).when(port).open(anyInt)
         doReturn(Success(())).when(port).close
 
         port.write(any[ByteString]) returns Success(3)

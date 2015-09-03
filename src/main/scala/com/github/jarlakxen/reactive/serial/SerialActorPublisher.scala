@@ -11,12 +11,15 @@ import java.nio.ByteBuffer
  * @author fviale
  */
 
-private[serial] class SerialActorPublisher(port: Port, bufferSize: Int) extends ActorPublisher[ByteString] with ActorLogging {
+private[serial] class SerialActorPublisher(
+    port: Port, 
+    baudRate: Int,
+    bufferSize: Int) extends ActorPublisher[ByteString] with ActorLogging {
 
   val readBuffer = new Array[Byte](bufferSize)
 
   override def preStart(): Unit = {
-    port.open.recover {
+    port.open(baudRate).recover {
       case ex =>
         log.error(ex, "Cannot start stream")
         self ! PoisonPill

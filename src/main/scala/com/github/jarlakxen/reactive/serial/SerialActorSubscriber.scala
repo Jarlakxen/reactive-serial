@@ -11,13 +11,14 @@ import scala.util.{ Try, Success, Failure }
 
 private[serial] class SerialActorSubscriber(
   port: Port,
+  baudRate: Int,
   requestStrategyProvider: RequestStrategy)
     extends ActorSubscriber with ActorLogging {
 
   override protected val requestStrategy = requestStrategyProvider
 
   override def preStart(): Unit = {
-    port.open match {
+    port.open(baudRate) match {
       case Success(_) =>
         request(1)
       case Failure(ex) =>
