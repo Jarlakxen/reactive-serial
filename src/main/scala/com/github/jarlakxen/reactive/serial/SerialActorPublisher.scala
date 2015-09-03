@@ -1,9 +1,8 @@
 package com.github.jarlakxen.reactive.serial
 
-import akka.actor.ActorLogging
+import akka.actor.{ PoisonPill, ActorLogging }
 import akka.stream.actor.{ ActorPublisher, ActorPublisherMessage }
 import akka.util.ByteString
-import com.fazecast.jSerialComm.SerialPort
 import scala.annotation.tailrec
 import scala.util.{ Try, Success, Failure }
 import java.nio.ByteBuffer
@@ -12,36 +11,29 @@ import java.nio.ByteBuffer
  * @author fviale
  */
 
-private[serial] class SerialActorPublisher(port: SerialPort, bufferSize: Int) extends ActorPublisher[ByteString] with ActorLogging {
+private[serial] class SerialActorPublisher(port: Port, bufferSize: Int) extends ActorPublisher[ByteString] with ActorLogging {
 
   val readBuffer = new Array[Byte](bufferSize)
 
   override def preStart(): Unit = {
-    if (!port.openPort) {
-      log.error(s"Cannot open port '${port.getDescriptivePortName}'")
-
+    port.open.recover {
+      case ex =>
+        log.error(ex, "Cannot start stream")
+        self ! PoisonPill
     }
   }
 
   override def receive = {
     case ActorPublisherMessage.Request(_) => readDemandedItems()
     case ActorPublisherMessage.Cancel | ActorPublisherMessage.SubscriptionTimeoutExceeded =>
-      port.closePort
+      port.close
       context.stop(self)
   }
 
   private def demand_? : Boolean = totalDemand > 0
 
-  private def tryReadingSingleElement(): Try[ByteString] = {
-
-    val length = port.readBytes(readBuffer, bufferSize)
-
-    if (length == -1) {
-      Failure(new RuntimeException(s"There was an error reading the port '${port.getDescriptivePortName}'"))
-    } else {
-      Success(ByteString.fromArray(readBuffer, 0, length))
-    }
-  }
+  private def tryReadingSingleElement(): Try[ByteString] =
+    port.read(readBuffer).map(length => ByteString.fromArray(readBuffer, 0, length))
 
   @tailrec
   private def readDemandedItems(): Unit = {

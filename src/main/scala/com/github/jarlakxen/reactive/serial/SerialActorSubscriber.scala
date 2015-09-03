@@ -1,25 +1,26 @@
 package com.github.jarlakxen.reactive.serial
 
-import akka.actor.ActorLogging
+import akka.actor.{ PoisonPill, ActorLogging }
 import akka.stream.actor.{ ActorSubscriber, ActorSubscriberMessage, RequestStrategy }
 import akka.util.ByteString
-import com.fazecast.jSerialComm.SerialPort
+import scala.util.{ Try, Success, Failure }
 
 /**
  * @author fviale
  */
 
 private[serial] class SerialActorSubscriber(
-  port: SerialPort,
+  port: Port,
   requestStrategyProvider: () => RequestStrategy)
     extends ActorSubscriber with ActorLogging {
 
   override protected val requestStrategy = requestStrategyProvider()
 
   override def preStart(): Unit = {
-    if (!port.openPort) {
-      log.error(s"Cannot open port '${port.getDescriptivePortName}'")
-      cancel()
+    port.open.recover {
+      case ex =>
+        log.error(ex, "Cannot start stream")
+        cancel()
     }
   }
 
@@ -36,10 +37,11 @@ private[serial] class SerialActorSubscriber(
   }
 
   private def process(data: ByteString): Unit = {
-    if (port.writeBytes(data.toArray, data.length) == -1) {
-      log.error(s"There was an error writing to the port '${port.getDescriptivePortName}'")
-      cancel()
-    }
+    port.write(data).recover {
+      case ex =>
+        log.error(ex, "Cannot continue with stream")
+        cancel()
+    } 
   }
 
   private def handleError(ex: Throwable): Unit = {
@@ -48,7 +50,7 @@ private[serial] class SerialActorSubscriber(
   }
 
   private def stop(): Unit = {
-    port.closePort
+    port.close
     context.stop(self)
   }
 

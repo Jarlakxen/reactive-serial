@@ -12,9 +12,7 @@ import org.reactivestreams.{ Publisher, Subscriber }
  * @author fviale
  */
 
-case class ReactiveSerial(port: SerialPort) {
-
-  port.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0)
+case class ReactiveSerial(port: Port) {
 
   def publisher(bufferSize: Int)(implicit actorSystem: ActorSystem): Publisher[ByteString] =
     ActorPublisher[ByteString](actorPublisher(bufferSize))
@@ -25,7 +23,6 @@ case class ReactiveSerial(port: SerialPort) {
   def actorPublisherProps(bufferSize: Int): Props =
     Props(new SerialActorPublisher(port, bufferSize))
 
-    
   def subscriber(requestStrategyProvider: () => RequestStrategy)(implicit actorSystem: ActorSystem): Subscriber[ByteString] =
     ActorSubscriber[ByteString](actorSubscriber(requestStrategyProvider))
 
@@ -39,12 +36,11 @@ case class ReactiveSerial(port: SerialPort) {
 
 object ReactiveSerial {
 
-  def serialPorts = SerialPort.getCommPorts().toList
+  lazy val ports = SerialPort.getCommPorts().map(new Port(_)).toList
 
-  def serialPort(portDescriptor: String) = SerialPort.getCommPort(portDescriptor)
+  def port(descriptor: String) = new Port(SerialPort.getCommPort(descriptor))
 
   def apply(): ReactiveSerial = {
-    val ports = serialPorts
     if (ports.nonEmpty) {
       ReactiveSerial(ports.head)
     } else {
@@ -52,6 +48,6 @@ object ReactiveSerial {
     }
   }
 
-  def apply(portDescriptor: String): ReactiveSerial = ReactiveSerial(serialPort(portDescriptor))
+  def apply(descriptor: String): ReactiveSerial = ReactiveSerial(port(descriptor))
 
 }
