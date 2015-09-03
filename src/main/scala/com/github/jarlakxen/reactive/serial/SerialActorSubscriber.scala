@@ -11,14 +11,16 @@ import scala.util.{ Try, Success, Failure }
 
 private[serial] class SerialActorSubscriber(
   port: Port,
-  requestStrategyProvider: () => RequestStrategy)
+  requestStrategyProvider: RequestStrategy)
     extends ActorSubscriber with ActorLogging {
 
-  override protected val requestStrategy = requestStrategyProvider()
+  override protected val requestStrategy = requestStrategyProvider
 
   override def preStart(): Unit = {
-    port.open.recover {
-      case ex =>
+    port.open match {
+      case Success(_) =>
+        request(1)
+      case Failure(ex) =>
         log.error(ex, "Cannot start stream")
         cancel()
     }
@@ -37,11 +39,13 @@ private[serial] class SerialActorSubscriber(
   }
 
   private def process(data: ByteString): Unit = {
-    port.write(data).recover {
-      case ex =>
+    port.write(data) match {
+      case Success(_) =>
+        request(1)
+      case Failure(ex) =>
         log.error(ex, "Cannot continue with stream")
         cancel()
-    } 
+    }
   }
 
   private def handleError(ex: Throwable): Unit = {

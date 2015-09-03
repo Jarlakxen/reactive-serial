@@ -45,7 +45,6 @@ val vjSerialComm  = "1.3.7"
 val vSlf4J        = "1.7.12"
 val vLogback      = "1.1.3"
 val vSpec2        = "3.6.4"
-val vScalamock    = "3.2"
 val vJUnit        = "4.12"
 
 libraryDependencies ++= Seq(
@@ -58,9 +57,10 @@ libraryDependencies ++= Seq(
   "org.slf4j"                     %  "slf4j-api"                          % vSlf4J,
   "ch.qos.logback"                %  "logback-classic"                    % vLogback      %  "test",
   // --- Testing ---
+  "com.typesafe.akka"             %% "akka-slf4j"                         % vAkka         %  "test",
   "com.typesafe.akka"             %% "akka-stream-testkit-experimental"   % vAkkaStream   %  "test",
-  "org.scalamock"                 %% "scalamock-specs2-support"           % vScalamock    %  "test",
   "org.specs2"                    %% "specs2-core"                        % vSpec2        %  "test",
+  "org.specs2"                    %% "specs2-mock"                        % vSpec2        %  "test",
   "org.specs2"                    %% "specs2-junit"                       % vSpec2        %  "test",
   "junit"                         %  "junit"                              % vJUnit        %  "test"
 )

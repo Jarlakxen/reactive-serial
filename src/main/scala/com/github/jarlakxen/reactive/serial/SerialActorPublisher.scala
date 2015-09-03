@@ -27,7 +27,7 @@ private[serial] class SerialActorPublisher(port: Port, bufferSize: Int) extends 
     case ActorPublisherMessage.Request(_) => readDemandedItems()
     case ActorPublisherMessage.Cancel | ActorPublisherMessage.SubscriptionTimeoutExceeded =>
       port.close
-      context.stop(self)
+      onCompleteThenStop()
   }
 
   private def demand_? : Boolean = totalDemand > 0

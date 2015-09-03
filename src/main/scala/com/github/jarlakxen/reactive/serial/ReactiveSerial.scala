@@ -23,13 +23,13 @@ case class ReactiveSerial(port: Port) {
   def actorPublisherProps(bufferSize: Int): Props =
     Props(new SerialActorPublisher(port, bufferSize))
 
-  def subscriber(requestStrategyProvider: () => RequestStrategy)(implicit actorSystem: ActorSystem): Subscriber[ByteString] =
+  def subscriber(requestStrategyProvider: RequestStrategy)(implicit actorSystem: ActorSystem): Subscriber[ByteString] =
     ActorSubscriber[ByteString](actorSubscriber(requestStrategyProvider))
 
-  def actorSubscriber(requestStrategyProvider: () => RequestStrategy)(implicit actorSystem: ActorSystem): ActorRef =
+  def actorSubscriber(requestStrategyProvider: RequestStrategy)(implicit actorSystem: ActorSystem): ActorRef =
     actorSystem.actorOf(actorSubscriberProps(requestStrategyProvider))
 
-  def actorSubscriberProps(requestStrategyProvider: () => RequestStrategy): Props =
+  def actorSubscriberProps(requestStrategyProvider: RequestStrategy): Props =
     Props(new SerialActorSubscriber(port, requestStrategyProvider))
 
 }
