@@ -10,13 +10,13 @@ import org.specs2.specification.core._
 import org.specs2.specification.mutable._
 import org.specs2.runner.JUnitRunner
 import akka.stream._
+import akka.stream.actor.ZeroRequestStrategy
 import akka.stream.scaladsl._
 import akka.stream.testkit.scaladsl._
 import akka.stream.actor.ActorPublisherMessage.Request
 import akka.testkit._
 import akka.util.ByteString
 import org.mockito.Matchers._
-import akka.stream.actor.ZeroRequestStrategy
 
 /**
  * @author fviale

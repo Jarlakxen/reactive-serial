@@ -12,7 +12,7 @@ import java.nio.ByteBuffer
  */
 
 private[serial] class SerialActorPublisher(
-    port: Port, 
+    port: Port,
     baudRate: Int,
     bufferSize: Int) extends ActorPublisher[ByteString] with ActorLogging {
 
@@ -22,30 +22,33 @@ private[serial] class SerialActorPublisher(
     port.open(baudRate).recover {
       case ex =>
         log.error(ex, "Cannot start stream")
-        self ! PoisonPill
+        port.close
+        onErrorThenStop(ex)
     }
   }
 
   override def receive = {
-    case ActorPublisherMessage.Request(_) => readDemandedItems()
+    case ActorPublisherMessage.Request(requestedElements) =>
+      log.debug(s"Requesting $requestedElements elements")
+      readDemandedItems(requestedElements)
     case ActorPublisherMessage.Cancel | ActorPublisherMessage.SubscriptionTimeoutExceeded =>
+      log.debug("Canceling streaming")
       port.close
       onCompleteThenStop()
   }
-
-  private def demand_? : Boolean = totalDemand > 0
 
   private def tryReadingSingleElement(): Try[ByteString] =
     port.read(readBuffer).map(length => ByteString.fromArray(readBuffer, 0, length))
 
   @tailrec
-  private def readDemandedItems(): Unit = {
+  private def readDemandedItems(requestedElements: Long): Unit = {
     tryReadingSingleElement() match {
-      case Success(data) =>
+      case Success(data) if requestedElements > 0 =>
         onNext(data)
-        if (demand_?) readDemandedItems()
+        readDemandedItems(requestedElements - 1)
       case Failure(ex) =>
-        onError(ex)
+        onErrorThenStop(ex)
+      case _ => // Do Nothing
     }
   }
 }
