@@ -88,8 +88,6 @@ pomExtra := (
   </developers>
 )
 
-credentials += Credentials(Path.userHome / ".sbt" / ".credentials")
-
 publishTo <<= version { v =>
   val nexus = "http://oss.sonatype.org/"
   if (v.endsWith("-SNAPSHOT"))
