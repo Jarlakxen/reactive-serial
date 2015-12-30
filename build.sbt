@@ -39,12 +39,12 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 // ··· Project Dependancies ···
 
-val vAkka         = "2.4.0"
-val vAkkaStream   = "1.0"
+val vAkka         = "2.4.1"
+val vAkkaStream   = "2.0.1"
 val vjSerialComm  = "1.3.9"
 val vSlf4J        = "1.7.13"
 val vLogback      = "1.1.3"
-val vSpec2        = "3.6.5"
+val vSpec2        = "3.6.6"
 val vJUnit        = "4.12"
 
 libraryDependencies ++= Seq(
