@@ -5,7 +5,7 @@
 Available at OSS Sonatype for 2.11:
 
 ````scala
-libraryDependencies += "com.github.jarlakxen" %% "reactive-serial" % "1.2"
+libraryDependencies += "com.github.jarlakxen" %% "reactive-serial" % "1.3"
 ````
 
 Example usage
