@@ -27,5 +27,5 @@ val serial = ReactiveSerial(port = serialPort, baudRate = 57600)
 val publisher: Publisher[ByteString] = serial.publisher(bufferSize=100)
 val subscriber: Subscriber[ByteString] = serial.subscriber(requestStrategyProvider=ZeroRequestStrategy)
 
-Source(publisher).map(_.message().toUpperCase).to(Sink(subscriber)).run()
+Source.fromPublisher(publisher).map(_.message().toUpperCase).to(Sink.fromSubscriber(subscriber)).run()
 ```
