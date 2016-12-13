@@ -9,7 +9,7 @@ name := "reactive-serial"
 
 organization := "com.github.jarlakxen"
 
-crossScalaVersions := Seq("2.11.8")
+crossScalaVersions := Seq("2.11.8", "2.12.1")
 
 scalaVersion <<= (crossScalaVersions) { versions => versions.head }
 
@@ -39,11 +39,11 @@ scalacOptions in Test ++= Seq("-Yrangepos")
 
 // ··· Project Dependancies ···
 
-val vAkka         = "2.4.2"
+val vAkka         = "2.4.14"
 val vjSerialComm  = "1.3.11"
-val vSlf4J        = "1.7.19"
-val vLogback      = "1.1.6"
-val vSpec2        = "3.7.2"
+val vSlf4J        = "1.7.22"
+val vLogback      = "1.1.8"
+val vSpec2        = "3.8.6"
 val vJUnit        = "4.12"
 
 libraryDependencies ++= Seq(
