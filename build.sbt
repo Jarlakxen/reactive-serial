@@ -15,9 +15,9 @@ scalaVersion <<= (crossScalaVersions) { versions => versions.head }
 
 fork in run  := true
 
-publishMavenStyle := true
-
 publishArtifact in Test := false
+
+licenses += ("Apache-2.0", url("https://opensource.org/licenses/Apache-2.0"))
 
 // ··· Project Enviroment ···
 
@@ -86,11 +86,3 @@ pomExtra := (
     </developer>
   </developers>
 )
-
-publishTo <<= version { v =>
-  val nexus = "https://oss.sonatype.org/"
-  if (v.endsWith("-SNAPSHOT"))
-  Some("sonatype-nexus-snapshots" at nexus + "content/repositories/snapshots/")
-  else
-  Some("sonatype-nexus-staging" at nexus + "service/local/staging/deploy/maven2/")
-}

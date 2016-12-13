@@ -2,9 +2,10 @@
 
 [Reactive Streams](http://www.reactive-streams.org) wrapper for [jSerialComm](http://fazecast.github.io/jSerialComm/). 
 
-Available at OSS Sonatype for 2.11 and 2.12:
+Available for 2.11 and 2.12:
 
 ````scala
+resolvers += Resolver.bintrayRepo("jarlakxen", "maven")
 libraryDependencies += "com.github.jarlakxen" %% "reactive-serial" % "1.4"
 ````
 
